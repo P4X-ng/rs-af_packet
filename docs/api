@@ -1,0 +1,10 @@
+# API Documentation
+
+This directory contains detailed API documentation for the af_packet library.
+
+## Contents
+
+- Core API reference
+- Usage examples
+- Error handling patterns
+- Performance considerations
