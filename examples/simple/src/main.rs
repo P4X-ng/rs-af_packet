@@ -1,6 +1,3 @@
-extern crate af_packet;
-extern crate num_cpus;
-
 use std::env;
 use std::thread;
 
