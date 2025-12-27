@@ -46,26 +46,26 @@ pub struct TpacketReq3 {
 
 #[derive(Clone, Debug)]
 pub struct TpacketBlockDesc {
-    version: u32,
-    offset_to_priv: u32,
+    pub version: u32,
+    pub offset_to_priv: u32,
     pub hdr: TpacketBDHeader,
 }
 
 #[derive(Clone, Debug)]
 pub struct TpacketBDHeader {
-    block_status: u32,
+    pub block_status: u32,
     pub num_pkts: u32,
-    offset_to_first_pkt: u32,
-    blk_len: u32,
-    seq_num: u64,
-    ts_first_pkt: TpacketBDTS,
-    ts_last_pkt: TpacketBDTS,
+    pub offset_to_first_pkt: u32,
+    pub blk_len: u32,
+    pub seq_num: u64,
+    pub ts_first_pkt: TpacketBDTS,
+    pub ts_last_pkt: TpacketBDTS,
 }
 
 #[derive(Clone, Debug)]
-struct TpacketBDTS {
-    ts_sec: u32,
-    ts_nsec: u32,
+pub struct TpacketBDTS {
+    pub ts_sec: u32,
+    pub ts_nsec: u32,
 }
 
 ///Contains details about individual packets in a block
@@ -89,7 +89,7 @@ pub struct TpacketHdrVariant1 {
     pub tp_rxhash: u32,
     pub tp_vlan_tci: u32,
     pub tp_vlan_tpid: u16,
-    tp_padding: u16,
+    pub tp_padding: u16,
 }
 
 impl Default for TpacketReq3 {

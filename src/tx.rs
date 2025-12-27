@@ -1,4 +1,4 @@
-use socket::{self, Socket};
+use crate::socket::{self, Socket};
 use std::{io, mem};
 
 use libc::{c_void, sendto, sockaddr, sockaddr_ll, AF_PACKET, ETH_ALEN};
@@ -35,7 +35,7 @@ impl Player {
             sendto(
                 self.sock.fd,
                 &mut frame as *mut _ as *mut c_void,
-                mem::size_of_val(&frame),
+                mem::size_of_val(frame),
                 0,
                 addr_ptr,
                 size as u32,

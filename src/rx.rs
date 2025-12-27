@@ -8,9 +8,9 @@ use libc::{
     PROT_WRITE,
 };
 
-use socket::{self, Socket, IFF_PROMISC};
+use crate::socket::{self, Socket, IFF_PROMISC};
 
-use tpacket3;
+use crate::tpacket3;
 
 //Used digits for these consts, if they were defined differently in C headers I have added that definition in the comments beside them
 
@@ -75,7 +75,8 @@ pub struct Ring {
 ///Contains a reference to a block as it exists in the ring buffer, its block descriptor, and a Vec of individual packets in that block.
 #[derive(Debug)]
 pub struct Block<'a> {
-    block_desc: tpacket3::TpacketBlockDesc,
+    pub block_desc: tpacket3::TpacketBlockDesc,
+    #[allow(dead_code)]
     packets: Vec<RawPacket<'a>>,
     raw_data: &'a mut [u8],
 }
@@ -106,7 +107,7 @@ impl<'a> Block<'a> {
 
     ///Returns a `Vec` of details and references to raw packets that can be read from the ring buffer
     #[inline]
-    pub fn get_raw_packets(&self) -> Vec<RawPacket> {
+    pub fn get_raw_packets(&self) -> Vec<RawPacket<'_>> {
         //standard block header is 48b
 
         let mut packets = Vec::<RawPacket>::new();
@@ -184,7 +185,7 @@ impl Ring {
     //marking blocks as consumed for performance reasons to avoid copies
     #[allow(unused_mut)]
     #[inline]
-    pub fn get_block(&mut self) -> Block {
+    pub fn get_block(&mut self) -> Block<'_> {
         loop {
             self.wait_for_block();
             //check all blocks in memory space

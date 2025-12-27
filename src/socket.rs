@@ -2,12 +2,12 @@ extern crate libc;
 
 use libc::{
     c_char, c_int, c_short, c_uint, c_ulong, c_void, getsockopt, if_nametoindex, ioctl, setsockopt,
-    socket, socklen_t, ETH_P_ALL, SOCK_RAW, SOL_PACKET, IF_NAMESIZE
+    socket, socklen_t, ETH_P_ALL, IF_NAMESIZE, SOCK_RAW, SOL_PACKET,
 };
 pub use libc::{AF_PACKET, IFF_PROMISC, PF_PACKET};
 
 use std::ffi::CString;
-use std::io::{self, Error, ErrorKind};
+use std::io::{self, Error};
 use std::mem;
 
 const IFREQUNIONSIZE: usize = 24;
@@ -41,7 +41,7 @@ impl IfReq {
         let mut if_req = IfReq::default();
 
         if if_name.len() >= if_req.ifr_name.len() {
-            return Err(Error::new(ErrorKind::Other, "Interface name too long"));
+            return Err(io::Error::other("Interface name too long"));
         }
 
         // basically a memcpy
@@ -134,7 +134,7 @@ impl Socket {
 }
 
 pub fn get_sock_opt(fd: i32, opt: c_int, opt_val: &*mut c_void) -> io::Result<()> {
-    let mut optlen = mem::size_of_val(&opt_val) as socklen_t;
+    let mut optlen = mem::size_of_val(opt_val) as socklen_t;
     match unsafe { getsockopt(fd, SOL_PACKET, opt, *opt_val, &mut optlen) } {
         0 => Ok(()),
         _ => Err(io::Error::last_os_error()),
