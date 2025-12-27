@@ -30,7 +30,7 @@ This library uses unsafe code to interface with Linux kernel APIs. All unsafe bl
 #### src/tx.rs
 
 1. **`mem::transmute` for sockaddr (line 37)**: Same as rx.rs - standard pattern for socket APIs.
-2. **`sendto()` call (line 39)**: Reviewed - Standard packet transmission. Note: size calculation uses `mem::size_of_val(frame)` which correctly gets slice length.
+2. **`sendto()` call (line 39)**: Safe - Standard packet transmission. Uses `frame.len()` to get correct packet size and `frame.as_ptr()` for proper pointer handling.
 
 ## Required Privileges
 

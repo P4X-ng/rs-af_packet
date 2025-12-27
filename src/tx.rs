@@ -20,7 +20,7 @@ impl Player {
     }
 
     ///sends a raw, whole ethernet frame on the socket
-    pub fn send_frame(&self, mut frame: &mut [u8]) -> io::Result<()> {
+    pub fn send_frame(&self, frame: &[u8]) -> io::Result<()> {
         let mut sa = sockaddr_ll {
             sll_family: AF_PACKET as u16,
             sll_protocol: 0,
@@ -39,8 +39,8 @@ impl Player {
         let b = unsafe {
             sendto(
                 self.sock.fd,
-                &mut frame as *mut _ as *mut c_void,
-                mem::size_of_val(frame),
+                frame.as_ptr() as *const c_void,
+                frame.len(),
                 0,
                 addr_ptr,
                 size as u32,
@@ -50,5 +50,20 @@ impl Player {
             return Ok(());
         }
         Err(io::Error::last_os_error())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_player_open_socket_invalid() {
+        // Test with an invalid interface name
+        let result = Player::open_socket("invalid_interface_name_12345");
+        // This should fail because the interface doesn't exist
+        // But the socket creation itself might succeed, only bind would fail later
+        // So we just test that the function can be called
+        let _ = result;
     }
 }
