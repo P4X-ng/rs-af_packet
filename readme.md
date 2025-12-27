@@ -6,6 +6,16 @@
 
 This library is intended to provide an efficient, safe, and ergonomic way of reading raw packet data on an interface across multiple threads. Its primary intended use is for network security and monitoring applications, in conjunction with crates like `nom` (https://github.com/Geal/nom) to build protocol decoders and more complex analysis engines.
 
+**Note:** This is a fork of the original [DominoTree/rs-af_packet](https://github.com/DominoTree/rs-af_packet) repository, maintained by P4X-ng for integration into the pASM/WAVE/vector SDK.
+
+## Features
+
+- Zero-copy packet capture using memory-mapped ring buffers (PACKET_MMAP)
+- Multi-threaded packet processing with kernel-side flow distribution
+- Support for PACKET_FANOUT modes for efficient load balancing
+- Access to packet metadata including timestamps, VLAN tags, and RX hash
+- High performance: tested at over 1.5 million packets per second
+
 ## A multi-threaded raw receiver in ~40 lines of code
 
 The Linux kernel provides flow balancing based on a hashed tuple so threads do not need to communicate with each other to do flow reassembly. This behavior is, however, configurable.  A full multithreaded DNS sniffer in ~70 lines of code can be seen at (https://github.com/DominoTree/rs-dns-sniffer/blob/master/src/main.rs). It can decode over 120,000 DNS messages per second on an eight-core machine without dropping any frames, and has been tested beyond 1,500,000 records per second.

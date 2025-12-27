@@ -1,3 +1,9 @@
+//! TPACKET_V3 protocol structures and parsing
+//!
+//! This module defines the Linux TPACKET_V3 structures used for zero-copy
+//! packet capture. It includes parsing functions for block descriptors,
+//! packet headers, and metadata.
+
 use libc::{c_int, c_uint};
 use nom::number::complete::{le_u16, le_u32, le_u64};
 use nom::IResult;
@@ -46,26 +52,26 @@ pub struct TpacketReq3 {
 
 #[derive(Clone, Debug)]
 pub struct TpacketBlockDesc {
-    version: u32,
-    offset_to_priv: u32,
+    pub version: u32,
+    pub offset_to_priv: u32,
     pub hdr: TpacketBDHeader,
 }
 
 #[derive(Clone, Debug)]
 pub struct TpacketBDHeader {
-    block_status: u32,
+    pub block_status: u32,
     pub num_pkts: u32,
-    offset_to_first_pkt: u32,
-    blk_len: u32,
-    seq_num: u64,
-    ts_first_pkt: TpacketBDTS,
-    ts_last_pkt: TpacketBDTS,
+    pub offset_to_first_pkt: u32,
+    pub blk_len: u32,
+    pub seq_num: u64,
+    pub ts_first_pkt: TpacketBDTS,
+    pub ts_last_pkt: TpacketBDTS,
 }
 
 #[derive(Clone, Debug)]
-struct TpacketBDTS {
-    ts_sec: u32,
-    ts_nsec: u32,
+pub struct TpacketBDTS {
+    pub ts_sec: u32,
+    pub ts_nsec: u32,
 }
 
 ///Contains details about individual packets in a block
@@ -89,7 +95,7 @@ pub struct TpacketHdrVariant1 {
     pub tp_rxhash: u32,
     pub tp_vlan_tci: u32,
     pub tp_vlan_tpid: u16,
-    tp_padding: u16,
+    pub tp_padding: u16,
 }
 
 impl Default for TpacketReq3 {
@@ -200,4 +206,63 @@ pub fn get_tpacket3_hdr(input: &[u8]) -> IResult<&[u8], Tpacket3Hdr> {
             hv1,
         },
     ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_default_tpacket_req3() {
+        let req = TpacketReq3::default();
+        assert_eq!(req.tp_block_size, 32768);
+        assert_eq!(req.tp_block_nr, 10000);
+        assert_eq!(req.tp_frame_size, 2048);
+        assert_eq!(req.tp_frame_nr, 160000);
+        assert_eq!(req.tp_retire_blk_tov, 100);
+        assert_eq!(req.tp_sizeof_priv, 0);
+        assert_eq!(req.tp_feature_req_word, TP_FT_REQ_FILL_RXHASH);
+    }
+
+    #[test]
+    fn test_default_tpacket_req3_size_consistency() {
+        let req = TpacketReq3::default();
+        // tp_frame_size * tp_frame_nr must equal tp_block_size * tp_block_nr
+        assert_eq!(
+            req.tp_frame_size * req.tp_frame_nr,
+            req.tp_block_size * req.tp_block_nr
+        );
+    }
+
+    #[test]
+    fn test_tpacket_bdts_parsing() {
+        let data: Vec<u8> = vec![
+            0x01, 0x02, 0x03, 0x04, // ts_sec (67305985 in little-endian)
+            0x05, 0x06, 0x07, 0x08, // ts_nsec (134678021 in little-endian)
+        ];
+        let result = get_tpacket_bdts(&data);
+        assert!(result.is_ok());
+        let (remaining, bdts) = result.unwrap();
+        assert_eq!(bdts.ts_sec, 0x04030201);
+        assert_eq!(bdts.ts_nsec, 0x08070605);
+        assert_eq!(remaining.len(), 0);
+    }
+
+    #[test]
+    fn test_tpacket_hdr_variant1_parsing() {
+        let data: Vec<u8> = vec![
+            0x01, 0x02, 0x03, 0x04, // tp_rxhash
+            0x05, 0x06, 0x07, 0x08, // tp_vlan_tci
+            0x09, 0x0a, // tp_vlan_tpid
+            0x0b, 0x0c, // tp_padding
+        ];
+        let result = get_tpacket_hdr_variant1(&data);
+        assert!(result.is_ok());
+        let (remaining, hdr) = result.unwrap();
+        assert_eq!(hdr.tp_rxhash, 0x04030201);
+        assert_eq!(hdr.tp_vlan_tci, 0x08070605);
+        assert_eq!(hdr.tp_vlan_tpid, 0x0a09);
+        assert_eq!(hdr.tp_padding, 0x0c0b);
+        assert_eq!(remaining.len(), 0);
+    }
 }
