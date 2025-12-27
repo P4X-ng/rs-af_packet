@@ -1,3 +1,8 @@
+//! Packet transmission functionality
+//!
+//! This module provides functionality for sending raw Ethernet frames
+//! using AF_PACKET sockets. It's designed for packet replay and injection.
+
 use crate::socket::{self, Socket};
 use std::{io, mem};
 

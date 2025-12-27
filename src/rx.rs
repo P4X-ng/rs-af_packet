@@ -1,3 +1,9 @@
+//! Receive ring buffer implementation for packet capture
+//!
+//! This module provides the main packet capture interface using memory-mapped
+//! ring buffers (PACKET_MMAP). It supports high-performance, zero-copy packet
+//! reception with configurable fanout modes for multi-threaded processing.
+
 use std;
 use std::io::{self, Error};
 use std::mem;
