@@ -77,12 +77,12 @@ jobs:
           echo "**Note:** GitHub Copilot CLI integration temporarily unavailable." >> /tmp/copilot-review.md
           echo "" >> /tmp/copilot-review.md
           echo "### Intended Review Areas:" >> /tmp/copilot-review.md
-          echo "1. Files larger than 500 lines that could be split into smaller modules" >> /tmp/copilot-review.md
-          echo "2. Code duplication and refactoring opportunities" >> /tmp/copilot-review.md
-          echo "3. Code style and formatting consistency" >> /tmp/copilot-review.md
-          echo "4. Complex functions that could be simplified" >> /tmp/copilot-review.md
-          echo "5. Code organization and structure improvements" >> /tmp/copilot-review.md
-          echo "6. Separation of concerns" >> /tmp/copilot-review.md
+          echo "1. Identify files that are too large (>500 lines) and suggest how to split them into smaller, focused modules" >> /tmp/copilot-review.md
+          echo "2. Look for code duplication and suggest refactoring opportunities" >> /tmp/copilot-review.md
+          echo "3. Check for consistent code style and formatting" >> /tmp/copilot-review.md
+          echo "4. Identify complex functions that could be simplified" >> /tmp/copilot-review.md
+          echo "5. Suggest improvements for code organization and structure" >> /tmp/copilot-review.md
+          echo "6. Check for proper separation of concerns" >> /tmp/copilot-review.md
           echo "" >> /tmp/copilot-review.md
           echo "### Manual Review Recommended" >> /tmp/copilot-review.md
           echo "Please conduct manual code review focusing on the areas listed above." >> /tmp/copilot-review.md

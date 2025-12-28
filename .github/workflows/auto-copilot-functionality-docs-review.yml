@@ -128,19 +128,33 @@ jobs:
           echo "" >> /tmp/doc-analysis.md
           echo "### README.md Quality Check:" >> /tmp/doc-analysis.md
           
+          # Check for README file (case-insensitive)
+          readme_file=""
           if [ -f "README.md" ]; then
-            word_count=$(wc -w < README.md)
+            readme_file="README.md"
+          elif [ -f "readme.md" ]; then
+            readme_file="readme.md"
+          elif [ -f "Readme.md" ]; then
+            readme_file="Readme.md"
+          elif [ -f "README.MD" ]; then
+            readme_file="README.MD"
+          fi
+          
+          if [ -n "$readme_file" ]; then
+            word_count=$(wc -w < "$readme_file" 2>/dev/null || echo 0)
+            # Ensure word_count is a valid number
+            word_count=${word_count:-0}
             echo "- Word count: $word_count" >> /tmp/doc-analysis.md
             
-            if [ $word_count -lt 50 ]; then
-              echo "⚠️ README.md is very short (< 50 words)" >> /tmp/doc-analysis.md
+            if [ "$word_count" -lt 50 ] 2>/dev/null; then
+              echo "⚠️ $readme_file is very short (< 50 words)" >> /tmp/doc-analysis.md
             else
-              echo "✅ README.md has adequate content" >> /tmp/doc-analysis.md
+              echo "✅ $readme_file has adequate content" >> /tmp/doc-analysis.md
             fi
             
             # Check for common sections
             for section in "Installation" "Usage" "Features" "Contributing" "License" "Documentation"; do
-              if grep -qi "$section" README.md; then
+              if grep -qi "$section" "$readme_file" 2>/dev/null; then
                 echo "✅ Contains '$section' section" >> /tmp/doc-analysis.md
               else
                 echo "⚠️ Missing '$section' section" >> /tmp/doc-analysis.md
@@ -181,8 +195,13 @@ jobs:
               class_count=$(grep -c "^class " "$file" 2>/dev/null || echo 0)
               docstring_count=$(grep -c '"""' "$file" 2>/dev/null || echo 0)
               
+              # Ensure all counts are valid numbers
+              func_count=${func_count:-0}
+              class_count=${class_count:-0}
+              docstring_count=${docstring_count:-0}
+              
               total=$((func_count + class_count))
-              if [ $total -gt 0 ] && [ $docstring_count -eq 0 ]; then
+              if [ "$total" -gt 0 ] 2>/dev/null && [ "$docstring_count" -eq 0 ] 2>/dev/null; then
                 echo "⚠️ $file: $total definitions, no docstrings" >> /tmp/doc-analysis.md
               fi
             done
@@ -202,8 +221,13 @@ jobs:
               class_count=$(grep -c "^class " "$file" 2>/dev/null || echo 0)
               jsdoc_count=$(grep -c '/\*\*' "$file" 2>/dev/null || echo 0)
               
+              # Ensure all counts are valid numbers
+              func_count=${func_count:-0}
+              class_count=${class_count:-0}
+              jsdoc_count=${jsdoc_count:-0}
+              
               total=$((func_count + class_count))
-              if [ $total -gt 5 ] && [ $jsdoc_count -eq 0 ]; then
+              if [ "$total" -gt 5 ] 2>/dev/null && [ "$jsdoc_count" -eq 0 ] 2>/dev/null; then
                 echo "⚠️ $file: ~$total definitions, no JSDoc comments" >> /tmp/doc-analysis.md
               fi
             done
