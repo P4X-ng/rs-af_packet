@@ -15,6 +15,9 @@ This library is intended to provide an efficient, safe, and ergonomic way of rea
 - Support for PACKET_FANOUT modes for efficient load balancing
 - Access to packet metadata including timestamps, VLAN tags, and RX hash
 - High performance: tested at over 1.5 million packets per second
+- **Enhanced Amazon Q Code Review Integration** with real security and performance analysis
+- Comprehensive security scanning with dependency vulnerability detection
+- Performance optimization analysis and architectural pattern validation
 
 ## A multi-threaded raw receiver in ~40 lines of code
 
@@ -75,5 +78,27 @@ fn main() {
     }
 }
 ```
+
+## Documentation and Analysis
+
+This library includes comprehensive documentation and automated analysis capabilities:
+
+- **[Security Analysis](SECURITY.md)**: Detailed security review of all unsafe code blocks
+- **[SDK Integration Guide](SDK_INTEGRATION.md)**: Complete integration guide for production use
+- **[Amazon Q Integration](docs/AMAZON_Q_INTEGRATION.md)**: Enhanced code review with real security and performance analysis
+- **[Review Summary](REVIEW_SUMMARY.md)**: Comprehensive review results and quality metrics
+- **[Changelog](CHANGELOG.md)**: Version history and changes
+
+### Automated Code Review
+
+The repository includes enhanced Amazon Q Code Review integration that provides:
+
+- **Real Security Analysis**: Dependency vulnerability scanning with `cargo-audit`
+- **Unsafe Code Analysis**: Comprehensive analysis with `cargo-geiger`
+- **Performance Metrics**: Code quality and optimization analysis
+- **Architecture Validation**: Design pattern and best practices verification
+- **AWS Best Practices**: Compliance with AWS Rust library guidelines
+
+The analysis runs automatically after GitHub Copilot workflows and generates detailed reports available as workflow artifacts.
 
 *Based on work by Tom Karpiniec (http://thomask.sdf.org/blog/2017/09/01/layer-2-raw-sockets-on-rustlinux.html) and Herman Radtke (http://hermanradtke.com/2016/03/17/unions-rust-ffi.html)*
