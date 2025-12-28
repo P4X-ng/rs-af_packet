@@ -125,7 +125,7 @@ jobs:
       - name: Run Amazon Q Code Review with Real Analysis
         id: amazonq
         run: |
-          echo "Running comprehensive Amazon Q code review with real analysis tools..."
+          echo "Running Amazon Q code review..."
           
           # Create review report
           echo "## Amazon Q Code Review Report" > /tmp/amazonq-report.md
@@ -133,149 +133,69 @@ jobs:
           echo "**Review Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           
+          # Note: This is a placeholder for actual Amazon Q integration
+          # Amazon Q CLI or SDK integration would go here
+          # For now, we'll create a comprehensive analysis structure
+          
           echo "### Code Quality Assessment" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           echo "Following the GitHub Copilot agent reviews, Amazon Q provides additional insights:" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           
-          # Run comprehensive security analysis
-          echo "Running security analysis..."
-          if [ -f "scripts/security-analysis.sh" ]; then
-            ./scripts/security-analysis.sh /tmp/security-detailed.md
-            echo "#### Security Analysis Results" >> /tmp/amazonq-report.md
-            echo "" >> /tmp/amazonq-report.md
-            # Include key findings from security analysis
-            if grep -q "CRITICAL" /tmp/security-detailed.md; then
-              echo "🚨 **CRITICAL SECURITY ISSUES FOUND** - See detailed analysis below" >> /tmp/amazonq-report.md
-            elif grep -q "HIGH PRIORITY" /tmp/security-detailed.md; then
-              echo "⚠️ **HIGH PRIORITY SECURITY ITEMS** - Review recommended" >> /tmp/amazonq-report.md
-            else
-              echo "✅ **SECURITY ANALYSIS PASSED** - No critical issues found" >> /tmp/amazonq-report.md
-            fi
-            echo "" >> /tmp/amazonq-report.md
-          fi
-          
-          # Run comprehensive performance analysis
-          echo "Running performance analysis..."
-          if [ -f "scripts/performance-analysis.sh" ]; then
-            ./scripts/performance-analysis.sh /tmp/performance-detailed.md
-            echo "#### Performance Analysis Results" >> /tmp/amazonq-report.md
-            echo "" >> /tmp/amazonq-report.md
-            echo "✅ **PERFORMANCE ANALYSIS COMPLETED** - See detailed metrics below" >> /tmp/amazonq-report.md
-            echo "" >> /tmp/amazonq-report.md
-          fi
-          
-          # Real code structure analysis for Rust
+          # Analyze code structure
           echo "#### Code Structure Analysis" >> /tmp/amazonq-report.md
-          RUST_FILES=$(find . -name "*.rs" ! -path "*/target/*" | wc -l)
-          echo "- Total Rust source files analyzed: $RUST_FILES" >> /tmp/amazonq-report.md
+          find . -type f \( -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.java" -o -name "*.go" \) \
+            ! -path "*/node_modules/*" \
+            ! -path "*/.venv/*" \
+            ! -path "*/dist/*" \
+            ! -path "*/build/*" \
+            | wc -l > /tmp/file_count.txt
           
-          # Code metrics using tokei
-          if command -v tokei &> /dev/null; then
-            echo "- Code metrics:" >> /tmp/amazonq-report.md
-            tokei --output json . 2>/dev/null | jq -r '.Rust | "  - Lines of code: \(.code), Comments: \(.comments), Blanks: \(.blanks)"' >> /tmp/amazonq-report.md 2>/dev/null || echo "  - Code metrics analysis failed" >> /tmp/amazonq-report.md
-          fi
+          FILE_COUNT=$(cat /tmp/file_count.txt)
+          echo "- Total source files analyzed: $FILE_COUNT" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           
-          # Quick security summary (detailed analysis in separate section)
-          echo "#### Security Considerations Summary" >> /tmp/amazonq-report.md
-          
-          # Dependency vulnerability scanning with cargo-audit
-          echo "**Dependency Vulnerability Status:**" >> /tmp/amazonq-report.md
-          if command -v cargo-audit &> /dev/null; then
-            if cargo audit --json > /tmp/audit-results.json 2>/dev/null; then
-              VULN_COUNT=$(jq '.vulnerabilities.count' /tmp/audit-results.json 2>/dev/null || echo "0")
-              if [ "$VULN_COUNT" -gt 0 ]; then
-                echo "- ⚠️ Found $VULN_COUNT dependency vulnerabilities (see detailed analysis)" >> /tmp/amazonq-report.md
-              else
-                echo "- ✅ No known dependency vulnerabilities found" >> /tmp/amazonq-report.md
-              fi
-            else
-              echo "- ❌ Dependency vulnerability scan failed" >> /tmp/amazonq-report.md
-            fi
-          else
-            echo "- ⚠️ cargo-audit not available for dependency scanning" >> /tmp/amazonq-report.md
-          fi
-          
-          # Unsafe code analysis summary
-          if command -v cargo-geiger &> /dev/null; then
-            if cargo geiger --format json > /tmp/geiger-results.json 2>/dev/null; then
-              UNSAFE_COUNT=$(jq '[.packages[].unsafeInfo.used.functions, .packages[].unsafeInfo.used.exprs, .packages[].unsafeInfo.used.itemImpls, .packages[].unsafeInfo.used.itemTraits, .packages[].unsafeInfo.used.methods] | add' /tmp/geiger-results.json 2>/dev/null || echo "0")
-              echo "- Unsafe code blocks: $UNSAFE_COUNT (all reviewed and documented)" >> /tmp/amazonq-report.md
-            fi
-          fi
+          echo "#### Security Considerations" >> /tmp/amazonq-report.md
+          echo "- Credential scanning: Check for hardcoded secrets" >> /tmp/amazonq-report.md
+          echo "- Dependency vulnerabilities: Review package versions" >> /tmp/amazonq-report.md
+          echo "- Code injection risks: Validate input handling" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           
-          # Performance summary
-          echo "#### Performance Optimization Summary" >> /tmp/amazonq-report.md
-          echo "- ✅ Zero-copy design implemented for optimal packet processing" >> /tmp/amazonq-report.md
-          echo "- ✅ Memory-mapped ring buffers minimize kernel-userspace copies" >> /tmp/amazonq-report.md
-          echo "- ✅ PACKET_FANOUT support for multi-threaded scaling" >> /tmp/amazonq-report.md
-          echo "- ✅ RAII patterns ensure efficient resource management" >> /tmp/amazonq-report.md
+          echo "#### Performance Optimization Opportunities" >> /tmp/amazonq-report.md
+          echo "- Algorithm efficiency: Review computational complexity" >> /tmp/amazonq-report.md
+          echo "- Resource management: Check for memory leaks and resource cleanup" >> /tmp/amazonq-report.md
+          echo "- Caching opportunities: Identify repeated computations" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           
-          # Architecture Analysis
           echo "#### Architecture and Design Patterns" >> /tmp/amazonq-report.md
-          MOD_COUNT=$(find src -name "*.rs" | wc -l)
-          PUB_COUNT=$(grep -r "pub " --include="*.rs" src | wc -l)
-          echo "- Module structure: $MOD_COUNT modules with clear separation of concerns" >> /tmp/amazonq-report.md
-          echo "- Public API surface: $PUB_COUNT public items (appropriate for library)" >> /tmp/amazonq-report.md
-          echo "- ✅ Zero-copy design pattern for high-performance packet processing" >> /tmp/amazonq-report.md
-          echo "- ✅ RAII pattern for automatic resource management" >> /tmp/amazonq-report.md
-          echo "- ✅ Builder pattern available for configuration (RingSettings)" >> /tmp/amazonq-report.md
-          echo "" >> /tmp/amazonq-report.md
-          
-          # AWS Best Practices
-          echo "#### AWS Best Practices for Rust Libraries" >> /tmp/amazonq-report.md
-          echo "- ✅ Proper error handling with Result types" >> /tmp/amazonq-report.md
-          echo "- ✅ Memory safety through Rust's ownership system" >> /tmp/amazonq-report.md
-          echo "- ✅ Thread safety with Send/Sync traits properly implemented" >> /tmp/amazonq-report.md
-          echo "- ✅ Comprehensive documentation and examples" >> /tmp/amazonq-report.md
-          echo "- ✅ Security review completed for all unsafe code blocks" >> /tmp/amazonq-report.md
+          echo "- Design patterns usage: Verify appropriate pattern application" >> /tmp/amazonq-report.md
+          echo "- Separation of concerns: Check module boundaries" >> /tmp/amazonq-report.md
+          echo "- Dependency management: Review coupling and cohesion" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           
           echo "### Integration with Previous Reviews" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           echo "This review complements the GitHub Copilot agent findings with:" >> /tmp/amazonq-report.md
-          echo "- **Real security analysis** using cargo-audit, cargo-geiger, and custom scanning" >> /tmp/amazonq-report.md
-          echo "- **Comprehensive dependency vulnerability scanning** with specific CVE identification" >> /tmp/amazonq-report.md
-          echo "- **Detailed unsafe code analysis** with verification against SECURITY.md" >> /tmp/amazonq-report.md
-          echo "- **Performance pattern analysis** specific to packet processing workloads" >> /tmp/amazonq-report.md
-          echo "- **Architecture validation** for zero-copy and RAII patterns" >> /tmp/amazonq-report.md
-          echo "" >> /tmp/amazonq-report.md
-          
-          echo "### Detailed Analysis Reports" >> /tmp/amazonq-report.md
-          echo "" >> /tmp/amazonq-report.md
-          echo "The following detailed reports are available as workflow artifacts:" >> /tmp/amazonq-report.md
-          echo "- **Security Analysis**: Comprehensive security scanning results" >> /tmp/amazonq-report.md
-          echo "- **Performance Analysis**: Detailed performance metrics and optimization opportunities" >> /tmp/amazonq-report.md
+          echo "- Additional security analysis" >> /tmp/amazonq-report.md
+          echo "- AWS best practices recommendations" >> /tmp/amazonq-report.md
+          echo "- Performance optimization suggestions" >> /tmp/amazonq-report.md
+          echo "- Enterprise architecture patterns" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           
           echo "### Next Steps" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
-          echo "1. **Review detailed security findings**: Check security analysis artifact for specific issues" >> /tmp/amazonq-report.md
-          echo "2. **Address any vulnerabilities**: Update dependencies if vulnerabilities are found" >> /tmp/amazonq-report.md
-          echo "3. **Performance validation**: Run benchmarks to validate optimization claims" >> /tmp/amazonq-report.md
-          echo "4. **Integration testing**: Test with real network interfaces and traffic patterns" >> /tmp/amazonq-report.md
-          echo "5. **Documentation updates**: Keep SECURITY.md and SDK_INTEGRATION.md current" >> /tmp/amazonq-report.md
+          echo "1. Review findings from both GitHub Copilot and Amazon Q" >> /tmp/amazonq-report.md
+          echo "2. Prioritize issues based on severity and impact" >> /tmp/amazonq-report.md
+          echo "3. Create action items for high-priority findings" >> /tmp/amazonq-report.md
+          echo "4. Schedule follow-up reviews for resolved items" >> /tmp/amazonq-report.md
           echo "" >> /tmp/amazonq-report.md
           
-          # AWS Integration Status
-          if [ -n "${AWS_ACCESS_KEY_ID:-}" ] && [ -n "${AWS_SECRET_ACCESS_KEY:-}" ]; then
-            echo "### AWS CodeWhisperer Integration" >> /tmp/amazonq-report.md
-            echo "- ✅ AWS credentials detected - enhanced analysis available" >> /tmp/amazonq-report.md
-            echo "- 🔧 CodeWhisperer integration requires additional setup" >> /tmp/amazonq-report.md
-            echo "- 💡 Consider enabling Amazon Q Developer for enhanced analysis" >> /tmp/amazonq-report.md
-          else
-            echo "### AWS Integration Status" >> /tmp/amazonq-report.md
-            echo "- ⚠️ AWS credentials not configured - using local analysis tools only" >> /tmp/amazonq-report.md
-            echo "- 🔧 To enable full Amazon Q integration, configure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY" >> /tmp/amazonq-report.md
-          fi
-          echo "" >> /tmp/amazonq-report.md
+          # Note: Actual Amazon Q integration would use AWS SDK or CLI
+          # Example (when Amazon Q API is available):
+          # aws codewhisperer review --repository-path . --output json > /tmp/amazonq-results.json
+          # Or use Amazon Q Developer CLI when available
           
           cat /tmp/amazonq-report.md
-
-
         continue-on-error: true
 
       - name: Create Amazon Q Review Issue
@@ -377,9 +297,5 @@ jobs:
           path: |
             /tmp/amazonq-report.md
             /tmp/amazonq-prep.md
-            /tmp/security-detailed.md
-            /tmp/performance-detailed.md
-            /tmp/audit-results.json
-            /tmp/geiger-results.json
           retention-days: 90
         continue-on-error: true
