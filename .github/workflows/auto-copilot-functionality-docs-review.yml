@@ -211,22 +211,28 @@ jobs:
           
           cat /tmp/doc-analysis.md
 
-      - name: GitHub Copilot Documentation Review
-        uses: austenstone/copilot-cli-action@v2
-        with:
-          copilot-token: ${{ secrets.COPILOT_TOKEN }}
-          prompt: |
-            Review the documentation for this repository:
-            1. Check README.md completeness and quality
-            2. Verify all features and functionality are documented
-            3. Check for installation and usage instructions
-            4. Identify missing or outdated documentation
-            5. Suggest improvements for clarity and completeness
-            6. Verify code comments and inline documentation
-            7. Check for API documentation if applicable
-            8. Ensure contributing guidelines are present
-            
-            Provide specific recommendations with file names and sections.
+      - name: GitHub Copilot Documentation Review (Placeholder)
+        run: |
+          echo "## GitHub Copilot Documentation Review" > /tmp/copilot-doc-review.md
+          echo "" >> /tmp/copilot-doc-review.md
+          echo "**Note:** GitHub Copilot CLI integration temporarily unavailable." >> /tmp/copilot-doc-review.md
+          echo "" >> /tmp/copilot-doc-review.md
+          echo "### Intended Review Areas:" >> /tmp/copilot-doc-review.md
+          echo "1. Check README.md completeness and quality" >> /tmp/copilot-doc-review.md
+          echo "2. Verify all features and functionality are documented" >> /tmp/copilot-doc-review.md
+          echo "3. Check for installation and usage instructions" >> /tmp/copilot-doc-review.md
+          echo "4. Identify missing or outdated documentation" >> /tmp/copilot-doc-review.md
+          echo "5. Suggest improvements for clarity and completeness" >> /tmp/copilot-doc-review.md
+          echo "6. Verify code comments and inline documentation" >> /tmp/copilot-doc-review.md
+          echo "7. Check for API documentation if applicable" >> /tmp/copilot-doc-review.md
+          echo "8. Ensure contributing guidelines are present" >> /tmp/copilot-doc-review.md
+          echo "" >> /tmp/copilot-doc-review.md
+          echo "### Manual Review Recommended" >> /tmp/copilot-doc-review.md
+          echo "Please conduct manual documentation review focusing on the areas listed above." >> /tmp/copilot-doc-review.md
+          echo "" >> /tmp/copilot-doc-review.md
+          echo "**TODO:** Restore automated Copilot integration when action becomes available." >> /tmp/copilot-doc-review.md
+          
+          cat /tmp/copilot-doc-review.md
         continue-on-error: true
 
       - name: Create Documentation Review Report
@@ -236,6 +242,7 @@ jobs:
           script: |
             const fs = require('fs');
             const analysis = fs.readFileSync('/tmp/doc-analysis.md', 'utf8');
+            const copilotReview = fs.readFileSync('/tmp/copilot-doc-review.md', 'utf8');
             
             const date = new Date().toISOString().split('T')[0];
             const title = `Code Functionality & Documentation Review - ${date}`;
@@ -249,6 +256,8 @@ jobs:
             ## Build Status: ${buildEmoji} ${buildStatus}
             
             ${analysis}
+            
+            ${copilotReview}
             
             ## Functionality Review
             
