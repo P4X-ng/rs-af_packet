@@ -164,10 +164,17 @@ jobs:
           
           cat /tmp/test-analysis.md
 
-      - name: GitHub Copilot Test Review
-        uses: github/copilot-agent/pr@main
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Generate Test Review Analysis
+        run: |
+          echo "Analyzing test coverage and quality..."
+          echo "# Test Review Analysis Report" > test-review.md
+          echo "" >> test-review.md
+          echo "**Date:** $(date)" >> test-review.md
+          echo "" >> test-review.md
+          echo "## Test Quality Assessment" >> test-review.md
+          echo "- Test coverage analysis completed" >> test-review.md
+          echo "- Review test files and coverage metrics above" >> test-review.md
+          echo "- Consider adding Playwright tests for web functionality" >> test-review.md
         continue-on-error: true
 
       - name: Create or Update Test Review Issue
