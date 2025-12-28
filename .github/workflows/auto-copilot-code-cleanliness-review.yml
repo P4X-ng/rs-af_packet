@@ -70,20 +70,26 @@ jobs:
           
           cat /tmp/analysis.md
 
-      - name: GitHub Copilot Code Review
-        uses: austenstone/copilot-cli-action@v2
-        with:
-          copilot-token: ${{ secrets.COPILOT_TOKEN }}
-          prompt: |
-            Review the codebase for code cleanliness issues:
-            1. Identify files that are too large (>500 lines) and suggest how to split them into smaller, focused modules
-            2. Look for code duplication and suggest refactoring opportunities
-            3. Check for consistent code style and formatting
-            4. Identify complex functions that could be simplified
-            5. Suggest improvements for code organization and structure
-            6. Check for proper separation of concerns
-            
-            Provide actionable recommendations with specific file names and line numbers.
+      - name: GitHub Copilot Code Review (Placeholder)
+        run: |
+          echo "## GitHub Copilot Code Review" > /tmp/copilot-review.md
+          echo "" >> /tmp/copilot-review.md
+          echo "**Note:** GitHub Copilot CLI integration temporarily unavailable." >> /tmp/copilot-review.md
+          echo "" >> /tmp/copilot-review.md
+          echo "### Intended Review Areas:" >> /tmp/copilot-review.md
+          echo "1. Identify files that are too large (>500 lines) and suggest how to split them into smaller, focused modules" >> /tmp/copilot-review.md
+          echo "2. Look for code duplication and suggest refactoring opportunities" >> /tmp/copilot-review.md
+          echo "3. Check for consistent code style and formatting" >> /tmp/copilot-review.md
+          echo "4. Identify complex functions that could be simplified" >> /tmp/copilot-review.md
+          echo "5. Suggest improvements for code organization and structure" >> /tmp/copilot-review.md
+          echo "6. Check for proper separation of concerns" >> /tmp/copilot-review.md
+          echo "" >> /tmp/copilot-review.md
+          echo "### Manual Review Recommended" >> /tmp/copilot-review.md
+          echo "Please conduct manual code review focusing on the areas listed above." >> /tmp/copilot-review.md
+          echo "" >> /tmp/copilot-review.md
+          echo "**TODO:** Restore automated Copilot integration when action becomes available." >> /tmp/copilot-review.md
+          
+          cat /tmp/copilot-review.md
         continue-on-error: true
 
       - name: Create Issue for Code Cleanliness Review
@@ -93,6 +99,7 @@ jobs:
           script: |
             const fs = require('fs');
             const analysis = fs.readFileSync('/tmp/analysis.md', 'utf8');
+            const copilotReview = fs.readFileSync('/tmp/copilot-review.md', 'utf8');
             
             const date = new Date().toISOString().split('T')[0];
             const title = `Code Cleanliness Review - ${date}`;
@@ -102,6 +109,8 @@ jobs:
             This is an automated review conducted every 12 hours to maintain code quality.
             
             ${analysis}
+            
+            ${copilotReview}
             
             ## Recommendations
             

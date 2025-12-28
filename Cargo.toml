@@ -9,6 +9,11 @@ keywords = ["pcap", "af_packet", "packet", "security", "linux"]
 categories = ["os", "os::unix-apis", "network-programming", "development-tools::ffi"]
 edition = "2021"
 
+[features]
+default = []
+# Feature for tests that require network privileges
+privileged-tests = []
+
 [dependencies]
 libc = "0.2"
 nom = "7"
