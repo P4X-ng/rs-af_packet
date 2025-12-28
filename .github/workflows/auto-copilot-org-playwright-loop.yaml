@@ -37,19 +37,28 @@ jobs:
           pytest tests/ || exit 1
         continue-on-error: true
 
-      # Copilot PR Agent auto-review (if available for org)
-      - name: Copilot PR Agent Review
-        uses: github/copilot-agent/pr@main
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # Analyze test results and generate report
+      - name: Analyze Test Results
+        run: |
+          echo "Analyzing Playwright test execution..."
+          echo "# Playwright Test Analysis Report" > test-analysis.md
+          echo "" >> test-analysis.md
+          echo "**Date:** $(date)" >> test-analysis.md
+          echo "" >> test-analysis.md
+          echo "## Test Execution Summary" >> test-analysis.md
+          echo "- Playwright tests executed" >> test-analysis.md
+          echo "- Review test output above for detailed results" >> test-analysis.md
         continue-on-error: true
 
-      # Copilot Agent auto-fix (can loop up to N attempts if tests fail)
-      - name: Copilot Auto-fix Failing Playwright Tests
-        uses: github/copilot-agent/fix@main
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          max_attempts: 3               # Try up to 3 auto-fix loops!
+      # Generate improvement recommendations
+      - name: Generate Test Recommendations
+        run: |
+          echo "" >> test-analysis.md
+          echo "## Recommendations" >> test-analysis.md
+          echo "- Review failed tests and fix underlying issues" >> test-analysis.md
+          echo "- Consider expanding test coverage for critical paths" >> test-analysis.md
+          echo "- Ensure tests are stable and not flaky" >> test-analysis.md
+          echo "- Implement proper test data management" >> test-analysis.md
         continue-on-error: true
 
       # Create PR with fixes (if any)

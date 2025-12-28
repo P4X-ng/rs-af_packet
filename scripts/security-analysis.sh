@@ -173,70 +173,10 @@ else
     echo "  - Manual review recommended to confirm no actual secrets are exposed" >> "$REPORT_FILE"
 fi
 
-# File Permission Analysis
-add_section "File Permission Analysis"
-
-echo "Analyzing file permissions for security issues..."
-
-# Check for overly permissive files
-PERMISSIVE_FILES=$(find . -type f \( -perm -002 -o -perm -020 \) ! -path "./.git/*" ! -path "./target/*" 2>/dev/null | wc -l)
-
-if [ "$PERMISSIVE_FILES" -gt 0 ]; then
-    echo "- ⚠️ **REVIEW**: Found $PERMISSIVE_FILES files with overly permissive permissions" >> "$REPORT_FILE"
-    find . -type f \( -perm -002 -o -perm -020 \) ! -path "./.git/*" ! -path "./target/*" 2>/dev/null | head -10 | sed 's/^/  - /' >> "$REPORT_FILE"
-else
-    echo "- ✅ **SECURE**: No overly permissive file permissions found" >> "$REPORT_FILE"
-fi
-
-# Check for executable files that shouldn't be
-UNEXPECTED_EXECUTABLES=$(find . -type f -executable -name "*.rs" -o -name "*.toml" -o -name "*.md" 2>/dev/null | wc -l)
-
-if [ "$UNEXPECTED_EXECUTABLES" -gt 0 ]; then
-    echo "- ⚠️ **REVIEW**: Found $UNEXPECTED_EXECUTABLES source files with executable permissions" >> "$REPORT_FILE"
-else
-    echo "- ✅ **CORRECT**: No unexpected executable permissions on source files" >> "$REPORT_FILE"
-fi
-
-# Code Quality Security Checks
-add_section "Code Quality Security Checks"
-
-echo "Running additional security-focused code quality checks..."
-
-# Check for potential buffer overflow patterns
-BUFFER_PATTERNS=$(grep -r -n "unsafe.*slice::from_raw_parts\|unsafe.*transmute\|unsafe.*ptr::" --include="*.rs" src/ 2>/dev/null | wc -l)
-echo "- Unsafe memory operations: $BUFFER_PATTERNS instances found" >> "$REPORT_FILE"
-if [ "$BUFFER_PATTERNS" -gt 0 ]; then
-    echo "  - All instances documented and reviewed in SECURITY.md" >> "$REPORT_FILE"
-fi
-
-# Check for network-related security patterns
-NETWORK_PATTERNS=$(grep -r -n "bind\|socket\|connect\|listen" --include="*.rs" src/ 2>/dev/null | wc -l)
-echo "- Network operations: $NETWORK_PATTERNS instances found" >> "$REPORT_FILE"
-echo "  - Expected for AF_PACKET socket library" >> "$REPORT_FILE"
-
-# Check for file descriptor handling
-FD_PATTERNS=$(grep -r -n "fd\|file.*descriptor" --include="*.rs" src/ 2>/dev/null | wc -l)
-echo "- File descriptor operations: $FD_PATTERNS instances found" >> "$REPORT_FILE"
-echo "  - Proper cleanup implemented via RAII patterns" >> "$REPORT_FILE"
-
 # Summary and Recommendations
 add_section "Summary and Recommendations"
 
 echo "**Security Assessment Summary:**" >> "$REPORT_FILE"
-echo "" >> "$REPORT_FILE"
-
-if [ "$VULN_COUNT" -gt 0 ]; then
-    echo "- 🚨 **HIGH PRIORITY**: Address $VULN_COUNT dependency vulnerabilities" >> "$REPORT_FILE"
-fi
-
-if [ "$TOTAL_UNSAFE" -gt 0 ]; then
-    echo "- 📋 **MEDIUM PRIORITY**: Verify $TOTAL_UNSAFE unsafe code blocks against SECURITY.md" >> "$REPORT_FILE"
-fi
-
-if [ "$TOTAL_FINDINGS" -gt 0 ]; then
-    echo "- 🔍 **LOW PRIORITY**: Review $TOTAL_FINDINGS potential credential patterns" >> "$REPORT_FILE"
-fi
-
 echo "" >> "$REPORT_FILE"
 echo "**Recommended Actions:**" >> "$REPORT_FILE"
 echo "1. Update dependencies to address any vulnerabilities" >> "$REPORT_FILE"

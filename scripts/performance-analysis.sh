@@ -162,21 +162,6 @@ echo "- ✅ Automatic resource cleanup via Drop trait" >> "$REPORT_FILE"
 echo "- ✅ File descriptors properly managed" >> "$REPORT_FILE"
 echo "- ✅ Memory mappings automatically unmapped" >> "$REPORT_FILE"
 
-# Compilation and Build Performance
-add_section "Compilation and Build Performance"
-
-echo "Analyzing build performance characteristics..."
-
-# Check dependency count
-DEPENDENCY_COUNT=$(grep -c "^[a-zA-Z]" Cargo.toml 2>/dev/null | tail -1 || echo "0")
-echo "**Build Characteristics:**" >> "$REPORT_FILE"
-echo "- Direct dependencies: $DEPENDENCY_COUNT (minimal dependency tree)" >> "$REPORT_FILE"
-echo "- Build profile: Optimized for both debug and release builds" >> "$REPORT_FILE"
-
-# Check for feature flags
-FEATURE_COUNT=$(grep -c "features.*=" Cargo.toml 2>/dev/null || echo "0")
-echo "- Feature flags: $FEATURE_COUNT (lean feature set)" >> "$REPORT_FILE"
-
 # Performance Optimization Opportunities
 add_section "Performance Optimization Opportunities"
 
@@ -194,33 +179,6 @@ echo "- 🔧 Implement custom allocators for specific workloads" >> "$REPORT_FIL
 echo "- 🔧 Add CPU affinity support for thread pinning" >> "$REPORT_FILE"
 echo "- 🔧 Consider lock-free data structures for multi-threading" >> "$REPORT_FILE"
 echo "- 🔧 Implement adaptive ring buffer sizing" >> "$REPORT_FILE"
-
-# Benchmarking Recommendations
-add_section "Benchmarking Recommendations"
-
-echo "**Recommended Performance Tests:**" >> "$REPORT_FILE"
-echo "1. **Packet Capture Throughput**" >> "$REPORT_FILE"
-echo "   - Measure packets per second at various rates" >> "$REPORT_FILE"
-echo "   - Test with different packet sizes" >> "$REPORT_FILE"
-echo "   - Monitor CPU usage and memory consumption" >> "$REPORT_FILE"
-echo "" >> "$REPORT_FILE"
-
-echo "2. **Memory Usage Profiling**" >> "$REPORT_FILE"
-echo "   - Track ring buffer memory allocation" >> "$REPORT_FILE"
-echo "   - Monitor for memory leaks during long runs" >> "$REPORT_FILE"
-echo "   - Measure memory fragmentation" >> "$REPORT_FILE"
-echo "" >> "$REPORT_FILE"
-
-echo "3. **Multi-threading Performance**" >> "$REPORT_FILE"
-echo "   - Test different PACKET_FANOUT modes" >> "$REPORT_FILE"
-echo "   - Measure scaling with thread count" >> "$REPORT_FILE"
-echo "   - Analyze load balancing effectiveness" >> "$REPORT_FILE"
-echo "" >> "$REPORT_FILE"
-
-echo "4. **Latency Analysis**" >> "$REPORT_FILE"
-echo "   - Measure packet processing latency" >> "$REPORT_FILE"
-echo "   - Test under various load conditions" >> "$REPORT_FILE"
-echo "   - Profile kernel-to-userspace transition time" >> "$REPORT_FILE"
 
 # Summary and Recommendations
 add_section "Summary and Recommendations"
