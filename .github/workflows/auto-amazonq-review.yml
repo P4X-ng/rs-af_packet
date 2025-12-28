@@ -98,7 +98,31 @@ jobs:
           
           cat /tmp/amazonq-prep.md
 
-      - name: Run Amazon Q Code Review
+      - name: Setup Rust toolchain for analysis
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: clippy
+          override: true
+
+      - name: Install security and analysis tools
+        run: |
+          # Install cargo-audit for dependency vulnerability scanning
+          cargo install cargo-audit --quiet || echo "cargo-audit installation failed"
+          
+          # Install cargo-deny for license and security policy enforcement
+          cargo install cargo-deny --quiet || echo "cargo-deny installation failed"
+          
+          # Install cargo-geiger for unsafe code analysis
+          cargo install cargo-geiger --quiet || echo "cargo-geiger installation failed"
+          
+          # Install tokei for code metrics
+          cargo install tokei --quiet || echo "tokei installation failed"
+          
+          # Make analysis scripts executable
+          chmod +x scripts/security-analysis.sh scripts/performance-analysis.sh
+
+      - name: Run Amazon Q Code Review with Real Analysis
         id: amazonq
         run: |
           echo "Running Amazon Q code review..."

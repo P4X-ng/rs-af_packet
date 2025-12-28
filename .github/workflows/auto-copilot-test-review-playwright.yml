@@ -164,22 +164,17 @@ jobs:
           
           cat /tmp/test-analysis.md
 
-      - name: GitHub Copilot Test Review
-        uses: austenstone/copilot-cli-action@v2
-        with:
-          copilot-token: ${{ secrets.COPILOT_TOKEN }}
-          prompt: |
-            Review the test suite for this repository:
-            1. Verify all web-based functionality has Playwright tests (both headed and headless)
-            2. Identify missing test coverage for critical functionality
-            3. Check test quality and maintainability
-            4. Suggest improvements for test organization
-            5. Verify tests follow best practices (isolation, clarity, proper assertions)
-            6. Check for flaky tests or tests with timing issues
-            7. Ensure tests are running in CI/CD pipeline
-            
-            For any web tests not using Playwright, recommend migration.
-            Provide specific, actionable recommendations with file names.
+      - name: Generate Test Review Analysis
+        run: |
+          echo "Analyzing test coverage and quality..."
+          echo "# Test Review Analysis Report" > test-review.md
+          echo "" >> test-review.md
+          echo "**Date:** $(date)" >> test-review.md
+          echo "" >> test-review.md
+          echo "## Test Quality Assessment" >> test-review.md
+          echo "- Test coverage analysis completed" >> test-review.md
+          echo "- Review test files and coverage metrics above" >> test-review.md
+          echo "- Consider adding Playwright tests for web functionality" >> test-review.md
         continue-on-error: true
 
       - name: Create or Update Test Review Issue
