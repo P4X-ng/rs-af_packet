@@ -1,13 +1,19 @@
+//! Socket management and configuration for AF_PACKET
+//!
+//! This module provides low-level socket operations for creating and configuring
+//! AF_PACKET sockets. It handles interface configuration, socket options, and
+//! ioctl operations.
+
 extern crate libc;
 
 use libc::{
     c_char, c_int, c_short, c_uint, c_ulong, c_void, getsockopt, if_nametoindex, ioctl, setsockopt,
-    socket, socklen_t, ETH_P_ALL, SOCK_RAW, SOL_PACKET, IF_NAMESIZE
+    socket, socklen_t, ETH_P_ALL, IF_NAMESIZE, SOCK_RAW, SOL_PACKET,
 };
 pub use libc::{AF_PACKET, IFF_PROMISC, PF_PACKET};
 
 use std::ffi::CString;
-use std::io::{self, Error, ErrorKind};
+use std::io::{self, Error};
 use std::mem;
 
 const IFREQUNIONSIZE: usize = 24;
@@ -41,7 +47,7 @@ impl IfReq {
         let mut if_req = IfReq::default();
 
         if if_name.len() >= if_req.ifr_name.len() {
-            return Err(Error::new(ErrorKind::Other, "Interface name too long"));
+            return Err(io::Error::other("Interface name too long"));
         }
 
         // basically a memcpy
@@ -134,7 +140,7 @@ impl Socket {
 }
 
 pub fn get_sock_opt(fd: i32, opt: c_int, opt_val: &*mut c_void) -> io::Result<()> {
-    let mut optlen = mem::size_of_val(&opt_val) as socklen_t;
+    let mut optlen = mem::size_of_val(opt_val) as socklen_t;
     match unsafe { getsockopt(fd, SOL_PACKET, opt, *opt_val, &mut optlen) } {
         0 => Ok(()),
         _ => Err(io::Error::last_os_error()),
@@ -145,4 +151,58 @@ pub fn get_if_index(name: &str) -> io::Result<c_uint> {
     let name = CString::new(name)?;
     let index = unsafe { if_nametoindex(name.as_ptr()) };
     Ok(index)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_ifreq_default() {
+        let ifreq = IfReq::default();
+        assert_eq!(ifreq.ifr_name.len(), IF_NAMESIZE);
+        assert_eq!(ifreq.data.len(), IFREQUNIONSIZE);
+    }
+
+    #[test]
+    fn test_ifreq_with_if_name() {
+        let result = IfReq::with_if_name("eth0");
+        assert!(result.is_ok());
+        let ifreq = result.unwrap();
+        assert_eq!(ifreq.ifr_name[0], b'e' as i8);
+        assert_eq!(ifreq.ifr_name[1], b't' as i8);
+        assert_eq!(ifreq.ifr_name[2], b'h' as i8);
+        assert_eq!(ifreq.ifr_name[3], b'0' as i8);
+    }
+
+    #[test]
+    fn test_ifreq_with_long_if_name() {
+        let long_name = "a".repeat(IF_NAMESIZE);
+        let result = IfReq::with_if_name(&long_name);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_ifreq_from_short() {
+        let value: c_short = 0x1234;
+        let ifreq = IfReq::from_short(value);
+        // Check that the bytes are stored correctly
+        assert!(ifreq.data[0] != 0 || ifreq.data[1] != 0);
+    }
+
+    #[test]
+    fn test_get_if_index_invalid() {
+        // Test with an invalid interface name
+        let result = get_if_index("invalid_interface_name_12345");
+        // This should return Ok(0) for non-existent interfaces
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 0);
+    }
+
+    #[test]
+    fn test_get_if_index_with_null_byte() {
+        // CString::new should fail if the name contains null bytes
+        let result = get_if_index("eth\0bad");
+        assert!(result.is_err());
+    }
 }

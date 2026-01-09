@@ -1,0 +1,10 @@
+# Integration Documentation
+
+This directory contains guides for integrating af_packet into the pASM/WAVE/vector SDK ecosystem.
+
+## Contents
+
+- SDK integration patterns
+- Configuration management
+- Deployment scenarios
+- Troubleshooting guides

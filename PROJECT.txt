@@ -1,0 +1,41 @@
+AF_PACKET High-Performance Network Library for pASM/WAVE/Vector SDK
+
+PROJECT OVERVIEW:
+This library provides high-performance AF_PACKET bindings for Rust, specifically designed for integration into the pASM/WAVE/vector SDK ecosystem. It enables raw packet capture and transmission on Linux systems using memory-mapped ring buffers for maximum efficiency.
+
+CORE CAPABILITIES:
+- Raw packet capture using Linux AF_PACKET interface
+- Memory-mapped ring buffers (TPACKET_V3) for zero-copy operations
+- Multi-threaded packet processing with kernel flow balancing
+- High-throughput packet transmission capabilities
+- Performance metrics and monitoring integration
+
+SDK INTEGRATION PURPOSE:
+This library serves as the foundational networking layer for the pASM/WAVE/vector SDK, providing:
+- Low-latency packet processing for network security applications
+- High-throughput data ingestion for vector processing pipelines
+- Real-time network monitoring and analysis capabilities
+- Efficient packet filtering and classification
+
+TARGET PERFORMANCE:
+- 120,000+ packets per second processing capability
+- Sub-microsecond packet processing latency
+- Multi-core scaling with linear performance improvements
+- Memory-efficient operation with minimal allocations
+
+DEPLOYMENT SCENARIOS:
+- Network security monitoring and analysis
+- High-frequency trading network capture
+- IoT device communication monitoring
+- Real-time network protocol analysis
+- Vector-based network anomaly detection
+
+TECHNICAL REQUIREMENTS:
+- Linux kernel 3.1+ with AF_PACKET support
+- Root privileges for raw socket operations
+- Multi-core CPU for optimal performance
+- Sufficient memory for ring buffer allocation
+
+INTEGRATION STATUS:
+Currently undergoing comprehensive review and enhancement for SDK integration.
+All components are being audited for security, performance, and API compatibility.
